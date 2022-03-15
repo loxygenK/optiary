@@ -1,11 +1,23 @@
 use std::cmp::Ordering::{Less, Equal, Greater};
 
 pub struct Time {
-    pub hour: u8,
-    pub minute: u8
+    hour: u8,
+    minute: u8
 }
 impl Time {
-    fn is_before_than(&self, other: &Time) -> bool {
+    pub fn new(hour: u8, minute: u8) -> Time {
+        Time { hour, minute }
+    }
+
+    pub fn hour(&self) -> u8 {
+        self.hour
+    }
+
+    pub fn minute(&self) -> u8 {
+        self.minute
+    }
+
+    pub fn is_before_than(&self, other: &Time) -> bool {
         match self.hour.cmp(&other.hour) {
             Less => true,
             Equal => self.minute <= other.minute,
@@ -13,11 +25,11 @@ impl Time {
         }
     }
 
-    fn is_after_than(&self, other: &Time) -> bool {
+    pub fn is_after_than(&self, other: &Time) -> bool {
         other.is_before_than(self)
     }
 
-    fn is_in_range(&self, start: &Time, end: &Time) -> bool {
+    pub fn is_in_range(&self, start: &Time, end: &Time) -> bool {
         self.is_after_than(start) && self.is_before_than(end)
     }
 }
