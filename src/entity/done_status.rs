@@ -20,19 +20,19 @@ impl DoneStatusList {
 mod tests {
     use super::{DoneStatus, DoneStatusList};
 
-    fn 時間を元に正しくDoneStatusを取れる() {
+    fn can_get_todo_status_by_the_time() {
 
     }
 
-    fn コンプリート状態を正しく判断できる() {
+    fn marked_as_complete_when_all_todo_status_is_done() {
 
     }
 
-    fn 完了した数を正しく計算できる() {
+    fn can_count_todos_marked_as_done() {
 
     }
 
-    fn 最大の完了数を正しく計算できる() {
+    fn can_count_maximum_dones() {
 
     }
 }
