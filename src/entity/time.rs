@@ -44,4 +44,18 @@ mod tests {
         assert_eq!(base_time.is_before_than(&comparing), before);
         assert_eq!(base_time.is_after_than(&comparing), after);
     }
+
+    #[rstest(start, end, expected,
+        case(time_of(11, 00), time_of(13, 00), true),
+        case(time_of(12, 00), time_of(12, 30), true),
+        case(time_of(12, 30), time_of(13, 00), true),
+        case(time_of(12, 30), time_of(12, 30), true),
+        case(time_of(11, 00), time_of(12, 00), false),
+        case(time_of(12, 59), time_of(13, 00), false)
+    )]
+    fn 範囲内かどうかを判断できる(start: Time, end: Time, expected: bool) {
+        let base_time = Time { hour: 12, minute: 30 };
+
+        assert_eq!(base_time.is_in_range(&start, &end), expected);
+    }
 }
