@@ -1,6 +1,6 @@
 use std::cmp::Ordering::{Less, Equal, Greater};
 
-#[derive(Eq, PartialEq, PartialOrd)]
+#[derive(Eq, PartialEq)]
 pub struct Time {
     hour: u8,
     minute: u8
@@ -23,6 +23,11 @@ impl Time {
 
     pub fn minute(&self) -> u8 {
         self.minute
+    }
+}
+impl PartialOrd for Time {
+    fn partial_cmp(&self, other: &Self) -> std::option::Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
     }
 }
 impl Ord for Time {

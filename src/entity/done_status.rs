@@ -64,7 +64,7 @@ impl DoneStatusList {
     }
 
     pub fn complete(&self) -> bool {
-        if self.statuses.len() == 0 {
+        if self.statuses.is_empty() {
             return false
         }
 
