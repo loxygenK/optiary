@@ -9,14 +9,18 @@ pub struct Todo {
     status: DoneStatusList
 }
 
-#[derive(Debug)]
+#[derive(PartialEq, Debug)]
 pub enum TodoValidationError {
-    TimeRangeSwapped
+    TimeRangeOppositeEnd,
+    TimeRangeSameEnd,
 }
 impl Todo {
     pub fn new(task: Task, from: Time, to: Time, status: DoneStatusList) -> Result<Todo, TodoValidationError> {
+        if from.is_same_to(&to) {
+            return Err(TodoValidationError::TimeRangeSameEnd);
+        }
         if from.is_after_than(&to) {
-            return Err(TodoValidationError::TimeRangeSwapped)
+            return Err(TodoValidationError::TimeRangeOppositeEnd);
         }
         Ok(Todo { task, from, to, status })
     }
@@ -28,8 +32,19 @@ impl Todo {
 
 #[cfg(test)]
 mod tests {
-    use super::{Task, Todo, Time, DoneStatusList};
+    use super::{Task, Todo, Time, DoneStatusList, TodoValidationError};
     use rstest::rstest;
+
+    #[rstest(start, end, expected,
+        case(Time::new(10, 00).unwrap(), Time::new(11, 0).unwrap(), None),
+        case(Time::new(10, 00).unwrap(), Time::new(10, 0).unwrap(), Some(TodoValidationError::TimeRangeSameEnd)),
+        case(Time::new(11, 00).unwrap(), Time::new(10, 0).unwrap(), Some(TodoValidationError::TimeRangeOppositeEnd)),
+    )]
+    fn opposite_end_not_allowed(start: Time, end: Time, expected: Option<TodoValidationError>) {
+        let maybe_todo = Todo::new(Task::new("Hoge").unwrap(), start, end, DoneStatusList::new(vec![]));
+
+        assert_eq!(maybe_todo.err(), expected);
+    }
 
     #[rstest(time, expected_includes,
         case(Time::new(10, 00).unwrap(), false),

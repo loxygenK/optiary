@@ -1,7 +1,7 @@
 pub struct Task {
     name: String
 }
-#[derive(Debug)]
+#[derive(PartialEq, Debug)]
 pub enum TaskValidationError {
     EmptyName
 }
