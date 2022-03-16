@@ -1,3 +1,4 @@
+use std::time::Duration;
 use std::cmp::Ordering::{Less, Equal, Greater};
 
 #[derive(Debug, Eq, PartialEq)]
@@ -25,16 +26,18 @@ impl Time {
         self.minute
     }
 
-    pub fn diff(&self, other: &Self) -> Option<Self> {
-        if self < &other {
+    pub fn duration_from(&self, from: &Self) -> Option<Duration> {
+        if from > self {
             return None;
         }
+        let self_minutes: u64 = (self.hour * 60 + self.minute)
+            .try_into()
+            .expect(&format!("must not happen: Converting Time to minute failed ({:?})", self));
+        let other_minutes: u64 = (from.hour * 60 + from.minute)
+            .try_into()
+            .expect(&format!("must not happen: Converting Time to minute failed ({:?})", self));
 
-        let self_minutes = self.hour * 60 + self.minute;
-        let other_minutes = other.hour * 60 + other.minute;
-
-        let diff = self_minutes - other_minutes;
-        Some(Time::new(diff / 60, diff % 60).unwrap())
+        Some(Duration::from_secs((self_minutes - other_minutes) * 60))
     }
 }
 impl PartialOrd for Time {
@@ -56,6 +59,7 @@ impl Ord for Time {
 mod tests {
     use std::cmp::Ordering;
     use super::{Time, TimeValidationError};
+    use std::time::Duration;
     use rstest::rstest;
 
     #[rstest(hour, minute, expected,
@@ -85,14 +89,14 @@ mod tests {
     }
 
     #[rstest(other, expected,
-        case(Time::new(10, 00).unwrap(), Some(Time::new(2, 0).unwrap())),
-        case(Time::new(11, 30).unwrap(), Some(Time::new(0, 30).unwrap())),
-        case(Time::new(12, 00).unwrap(), Some(Time::new(0, 0).unwrap())),
+        case(Time::new(10, 00).unwrap(), Some(Duration::from_secs(2 * 60 * 60))),
+        case(Time::new(11, 30).unwrap(), Some(Duration::from_secs(30 * 60))),
+        case(Time::new(12, 00).unwrap(), Some(Duration::from_secs(0))),
         case(Time::new(13, 00).unwrap(), None),
     )]
-    fn can_calculate_differential(other: Time, expected: Option<Time>) {
+    fn can_calculate_differential(other: Time, expected: Option<Duration>) {
         let base_time = Time::new(12, 00).unwrap();
-        let diff = base_time.diff(&other);
+        let diff = base_time.duration_from(&other);
 
         assert_eq!(diff, expected);
     }
