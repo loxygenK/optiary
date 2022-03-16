@@ -23,6 +23,14 @@ impl DoneStatus {
     fn undone(&self) -> bool {
         !self.done()
     }
+
+    fn mark_as_done(&mut self) {
+        self.done = true
+    }
+
+    fn mark_as_undone(&mut self) {
+        self.done = false
+    }
 }
 
 pub struct DoneStatusList {
@@ -75,6 +83,19 @@ impl DoneStatusList {
 mod tests {
     use super::{Time, TimeRange, DoneStatus, DoneStatusList};
     use rstest::rstest;
+
+    #[rstest]
+    fn can_mark_as_done_or_undone() {
+        let mut done_status = DoneStatus::new(Time::new(12, 00).unwrap(), false);
+
+        done_status.mark_as_done();
+        assert_eq!(done_status.done(), true);
+        assert_eq!(done_status.undone(), false);
+
+        done_status.mark_as_undone();
+        assert_eq!(done_status.done(), false);
+        assert_eq!(done_status.undone(), true);
+    }
 
     fn todo_status_list_from_done_count(done: usize, undone: usize) -> DoneStatusList {
         let dones = (0..done)

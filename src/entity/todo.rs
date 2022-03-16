@@ -18,7 +18,15 @@ impl Todo {
         &self.range
     }
 
+    pub fn range_mut(&mut self) -> &mut TimeRange {
+        &mut self.range
+    }
+
     pub fn status(&self) -> &DoneStatusList {
         &self.status
+    }
+
+    pub fn status_mut(&mut self) -> &mut DoneStatusList {
+        &mut self.status
     }
 }
