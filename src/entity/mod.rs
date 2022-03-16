@@ -1,18 +1,9 @@
 mod done_status;
+mod task;
 mod time;
+mod todo;
 
-pub use done_status::{DoneStatus, DoneStatusList};
-pub use time::Time;
-
-pub struct Task {
-    pub id: String,
-    pub name: String
-}
-
-pub struct Todo {
-    pub id: String,
-    pub task: Task,
-    pub from: Time,
-    pub to: Time,
-    pub status: DoneStatusList
-}
+pub use done_status::*;
+pub use task::*;
+pub use time::*;
+pub use todo::*;
