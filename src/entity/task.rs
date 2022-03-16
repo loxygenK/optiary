@@ -17,3 +17,19 @@ impl Task {
         &self.name
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{Task, TaskValidationError};
+    use rstest::rstest;
+
+    #[rstest(name, expected,
+        case("task", None),
+        case("", Some(TaskValidationError::EmptyName))
+    )]
+    fn empty_name_not_allowed(name: &str, expected: Option<TaskValidationError>) {
+        let maybe_task = Task::new(name);
+
+        assert_eq!(maybe_task.err(), expected);
+    }
+}
