@@ -40,7 +40,7 @@ impl DoneStatusList {
     pub fn get_from_range(&self, start: &Time, end: &Time) -> Vec<&DoneStatus> {
         self.statuses
             .iter()
-            .filter(|s| s.applicable_time().is_in_range(start, end))
+            .filter(|&s| s.applicable_time().is_in_range(start, end))
             .collect::<Vec<&DoneStatus>>()
     }
 
@@ -89,7 +89,7 @@ mod tests {
     fn todo_status_list_from_time(time: &[(u8, u8)]) -> DoneStatusList {
         DoneStatusList::new(
             time.iter()
-                .map(|(h, m)| DoneStatus::new(&Time::new(*h, *m), false))
+                .map(|&(h, m)| DoneStatus::new(&Time::new(h, m), false))
                 .collect()
         )
     }
