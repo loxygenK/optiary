@@ -10,11 +10,11 @@ pub enum TimeValidationError {
     OutOfRange
 }
 impl Time {
-    pub fn new(hour: u8, minute: u8) -> Result<Time, TimeValidationError> {
+    pub fn new(hour: u8, minute: u8) -> Result<Self, TimeValidationError> {
         if hour > 23 || minute > 59 {
             return Err(TimeValidationError::OutOfRange)
         }
-        Ok(Time { hour, minute })
+        Ok(Self { hour, minute })
     }
 
     pub fn hour(&self) -> u8 {

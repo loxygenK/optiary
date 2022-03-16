@@ -6,11 +6,11 @@ pub enum TaskValidationError {
     EmptyName
 }
 impl Task {
-    pub fn new(name: &str) -> Result<Task, TaskValidationError> {
+    pub fn new(name: &str) -> Result<Self, TaskValidationError> {
         if name.is_empty() {
             return Err(TaskValidationError::EmptyName)
         }
-        Ok(Task { name: name.to_owned() })
+        Ok(Self { name: name.to_owned() })
     }
 
     pub fn name(&self) -> &str {

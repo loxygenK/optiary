@@ -10,7 +10,7 @@ pub struct Todo {
 }
 
 impl Todo {
-    pub fn new(task: Task, range: TimeRange, status: DoneStatusList) -> Result<Todo, ()> {
+    pub fn new(task: Task, range: TimeRange, status: DoneStatusList) -> Result<Self, ()> {
         Ok(Todo { task, range, status })
     }
 }

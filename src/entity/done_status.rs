@@ -6,8 +6,8 @@ pub struct DoneStatus {
     done: bool
 }
 impl DoneStatus {
-    fn new(applicable_time: Time, done: bool) -> DoneStatus {
-        DoneStatus {
+    fn new(applicable_time: Time, done: bool) -> Self {
+        Self {
             applicable_time,
             done
         }
@@ -30,7 +30,7 @@ pub struct DoneStatusList {
     statuses: Vec<DoneStatus>
 }
 impl DoneStatusList {
-    pub fn new(statuses: Vec<DoneStatus>) -> DoneStatusList {
+    pub fn new(statuses: Vec<DoneStatus>) -> Self {
         DoneStatusList { statuses }
     }
 

@@ -10,7 +10,7 @@ pub enum TimeRangeValidationError {
     SameEnd
 }
 impl TimeRange {
-    pub fn new(start: Time, end: Time) -> Result<TimeRange, TimeRangeValidationError> {
+    pub fn new(start: Time, end: Time) -> Result<Self, TimeRangeValidationError> {
         if start == end {
             return Err(TimeRangeValidationError::SameEnd);
         }
@@ -18,7 +18,7 @@ impl TimeRange {
             return Err(TimeRangeValidationError::OppositeEnd);
         }
 
-        Ok(TimeRange { start, end })
+        Ok(Self { start, end })
     }
 
     pub fn includes(&self, other: &Time) -> bool {
