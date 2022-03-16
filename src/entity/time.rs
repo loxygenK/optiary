@@ -4,9 +4,16 @@ pub struct Time {
     hour: u8,
     minute: u8
 }
+#[derive(Debug)]
+pub enum TimeValidationError {
+    OutOfRange
+}
 impl Time {
-    pub fn new(hour: u8, minute: u8) -> Time {
-        Time { hour, minute }
+    pub fn new(hour: u8, minute: u8) -> Result<Time, TimeValidationError> {
+        if hour > 23 && minute > 59 {
+            return Err(TimeValidationError::OutOfRange)
+        }
+        Ok(Time { hour, minute })
     }
 
     pub fn hour(&self) -> u8 {
@@ -39,16 +46,12 @@ mod tests {
     use super::Time;
     use rstest::rstest;
 
-    fn time_of(hour: u8, minute: u8) -> Time {
-        Time { hour, minute }
-    }
-
     #[rstest(comparing, before, after,
-        case(time_of(11, 00), false, true),
-        case(time_of(12, 00), false, true),
-        case(time_of(12, 30), true, true),
-        case(time_of(12, 59), true, false),
-        case(time_of(13, 00), true, false)
+        case(Time::new(11, 00).unwrap(), false, true),
+        case(Time::new(12, 00).unwrap(), false, true),
+        case(Time::new(12, 30).unwrap(), true, true),
+        case(Time::new(12, 59).unwrap(), true, false),
+        case(Time::new(13, 00).unwrap(), true, false)
     )]
     fn can_compare_time(comparing: Time, before: bool, after: bool) {
         let base_time = Time { hour: 12, minute: 30 };
@@ -58,12 +61,12 @@ mod tests {
     }
 
     #[rstest(start, end, expected,
-        case(time_of(11, 00), time_of(13, 00), true),
-        case(time_of(12, 00), time_of(12, 30), true),
-        case(time_of(12, 30), time_of(13, 00), true),
-        case(time_of(12, 30), time_of(12, 30), true),
-        case(time_of(11, 00), time_of(12, 00), false),
-        case(time_of(12, 59), time_of(13, 00), false)
+        case(Time::new(11, 00).unwrap(), Time::new(13, 00).unwrap(), true),
+        case(Time::new(12, 00).unwrap(), Time::new(12, 30).unwrap(), true),
+        case(Time::new(12, 30).unwrap(), Time::new(13, 00).unwrap(), true),
+        case(Time::new(12, 30).unwrap(), Time::new(12, 30).unwrap(), true),
+        case(Time::new(11, 00).unwrap(), Time::new(12, 00).unwrap(), false),
+        case(Time::new(12, 59).unwrap(), Time::new(13, 00).unwrap(), false)
     )]
     fn can_check_if_the_time_is_between_two_times(start: Time, end: Time, expected: bool) {
         let base_time = Time { hour: 12, minute: 30 };

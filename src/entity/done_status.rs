@@ -5,15 +5,15 @@ pub struct DoneStatus {
     done: bool
 }
 impl DoneStatus {
-    fn new(applicable_time: &Time, done: bool) -> DoneStatus {
+    fn new(applicable_time: Time, done: bool) -> DoneStatus {
         DoneStatus {
-            applicable_time: Time::new(applicable_time.hour(), applicable_time.minute()),
+            applicable_time,
             done
         }
     }
 
-    fn applicable_time(&self) -> Time {
-        Time::new(self.applicable_time.hour(), self.applicable_time.minute())
+    fn applicable_time(&self) -> &Time {
+        &self.applicable_time
     }
 
     fn done(&self) -> bool {
@@ -78,9 +78,9 @@ mod tests {
 
     fn todo_status_list_from_done_count(done: usize, undone: usize) -> DoneStatusList {
         let dones = (0..done)
-            .map(|_| DoneStatus::new(&Time::new(12, 30), true));
+            .map(|_| DoneStatus::new(Time::new(12, 30).unwrap(), true));
         let undones = (0..undone)
-            .map(|_| DoneStatus::new(&Time::new(12, 30), false));
+            .map(|_| DoneStatus::new(Time::new(12, 30).unwrap(), false));
 
         let done_status: Vec<DoneStatus> = dones.chain(undones).collect();
         DoneStatusList::new(done_status)
@@ -89,19 +89,19 @@ mod tests {
     fn todo_status_list_from_time(time: &[(u8, u8)]) -> DoneStatusList {
         DoneStatusList::new(
             time.iter()
-                .map(|&(h, m)| DoneStatus::new(&Time::new(h, m), false))
+                .map(|&(h, m)| DoneStatus::new(Time::new(h, m).unwrap(), false))
                 .collect()
         )
     }
 
     #[rstest(start, end, expected_count,
-        case(Time::new(9, 00), Time::new(13,00), 3),
-        case(Time::new(10, 00), Time::new(12,00), 3),
-        case(Time::new(10, 00), Time::new(11,00), 2),
-        case(Time::new(11, 00), Time::new(12,00), 2),
-        case(Time::new(10, 00), Time::new(10,00), 1),
-        case(Time::new(9, 00), Time::new(10,00), 1),
-        case(Time::new(13, 00), Time::new(14,00), 0),
+        case(Time::new(9, 00).unwrap(), Time::new(13,00).unwrap(), 3),
+        case(Time::new(10, 00).unwrap(), Time::new(12,00).unwrap(), 3),
+        case(Time::new(10, 00).unwrap(), Time::new(11,00).unwrap(), 2),
+        case(Time::new(11, 00).unwrap(), Time::new(12,00).unwrap(), 2),
+        case(Time::new(10, 00).unwrap(), Time::new(10,00).unwrap(), 1),
+        case(Time::new(9, 00).unwrap(), Time::new(10,00).unwrap(), 1),
+        case(Time::new(13, 00).unwrap(), Time::new(14,00).unwrap(), 0),
     )]
     fn can_get_todo_status_by_the_time(start: Time, end: Time, expected_count: usize) {
         let todo_status_list = todo_status_list_from_time(&[(10, 00), (11, 00), (12, 00)]);
