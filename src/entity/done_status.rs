@@ -1,5 +1,4 @@
-use crate::entity::TimeRange;
-use crate::entity::Time;
+use crate::entity::{TimeRange, Time};
 
 pub struct DoneStatus {
     applicable_time: Time,

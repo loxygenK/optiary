@@ -1,7 +1,4 @@
-use crate::entity::TimeRange;
-use crate::entity::DoneStatusList;
-use crate::entity::Time;
-use crate::entity::Task;
+use crate::entity::{TimeRange, DoneStatusList, Task};
 
 pub struct Todo {
     task: Task,
