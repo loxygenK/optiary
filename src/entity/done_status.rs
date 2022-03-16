@@ -1,3 +1,4 @@
+use crate::entity::TimeRange;
 use crate::entity::Time;
 
 pub struct DoneStatus {
@@ -37,10 +38,10 @@ impl DoneStatusList {
         &self.statuses
     }
 
-    pub fn get_from_range(&self, start: &Time, end: &Time) -> Vec<&DoneStatus> {
+    pub fn get_from_range(&self, range: &TimeRange) -> Vec<&DoneStatus> {
         self.statuses
             .iter()
-            .filter(|&s| s.applicable_time().is_in_range(start, end))
+            .filter(|&s| range.includes(&s.applicable_time))
             .collect::<Vec<&DoneStatus>>()
     }
 
@@ -73,7 +74,7 @@ impl DoneStatusList {
 
 #[cfg(test)]
 mod tests {
-    use super::{Time, DoneStatus, DoneStatusList};
+    use super::{Time, TimeRange, DoneStatus, DoneStatusList};
     use rstest::rstest;
 
     fn todo_status_list_from_done_count(done: usize, undone: usize) -> DoneStatusList {
@@ -95,18 +96,21 @@ mod tests {
     }
 
     #[rstest(start, end, expected_count,
-        case(Time::new(9, 00).unwrap(), Time::new(13,00).unwrap(), 3),
-        case(Time::new(10, 00).unwrap(), Time::new(12,00).unwrap(), 3),
-        case(Time::new(10, 00).unwrap(), Time::new(11,00).unwrap(), 2),
-        case(Time::new(11, 00).unwrap(), Time::new(12,00).unwrap(), 2),
-        case(Time::new(10, 00).unwrap(), Time::new(10,00).unwrap(), 1),
-        case(Time::new(9, 00).unwrap(), Time::new(10,00).unwrap(), 1),
-        case(Time::new(13, 00).unwrap(), Time::new(14,00).unwrap(), 0),
+        case((9, 00), (13,00), 3),
+        case((10, 00), (12,00), 2),
+        case((10, 00), (11,00), 1),
+        case((11, 00), (12,00), 1),
+        case((9, 00), (10,00), 0),
+        case((13, 00), (14,00), 0),
     )]
-    fn can_get_todo_status_by_the_time(start: Time, end: Time, expected_count: usize) {
+    fn can_get_todo_status_by_the_time(start: (u8, u8), end: (u8, u8), expected_count: usize) {
         let todo_status_list = todo_status_list_from_time(&[(10, 00), (11, 00), (12, 00)]);
+        let range = TimeRange::new(
+            Time::new(start.0, start.1).unwrap(),
+            Time::new(end.0, end.1).unwrap()
+        ).unwrap();
 
-        assert_eq!(todo_status_list.get_from_range(&start, &end).len(), expected_count);
+        assert_eq!(todo_status_list.get_from_range(&range).len(), expected_count);
     }
 
     #[rstest(done, undone, expected_complete,
