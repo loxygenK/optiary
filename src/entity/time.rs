@@ -1,5 +1,6 @@
 use std::cmp::Ordering::{Less, Equal, Greater};
 
+#[derive(Eq, PartialEq, PartialOrd)]
 pub struct Time {
     hour: u8,
     minute: u8
@@ -23,26 +24,20 @@ impl Time {
     pub fn minute(&self) -> u8 {
         self.minute
     }
-
-    pub fn is_before_than(&self, other: &Time) -> bool {
+}
+impl Ord for Time {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         match self.hour.cmp(&other.hour) {
-            Less => true,
-            Equal => self.minute < other.minute,
-            Greater => false
+            Less => Less,
+            Equal => self.minute.cmp(&other.minute),
+            Greater => Greater
         }
-    }
-
-    pub fn is_after_than(&self, other: &Time) -> bool {
-        !other.is_same_to(self) && other.is_before_than(self)
-    }
-
-    pub fn is_same_to(&self, other: &Time) -> bool {
-        self.hour == other.hour && self.minute == other.minute
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::cmp::Ordering;
     use super::{Time, TimeValidationError};
     use rstest::rstest;
 
@@ -59,18 +54,16 @@ mod tests {
         assert_eq!(maybe_time.err(), expected);
     }
 
-    #[rstest(comparing, before, same, after,
-        case(Time::new(11, 00).unwrap(), false, false, true),
-        case(Time::new(12, 00).unwrap(), false, false, true),
-        case(Time::new(12, 30).unwrap(), false, true, false),
-        case(Time::new(12, 59).unwrap(), true, false, false),
-        case(Time::new(13, 00).unwrap(), true, false, false)
+    #[rstest(comparing, comparison,
+        case(Time::new(11, 00).unwrap(), Ordering::Greater),
+        case(Time::new(12, 00).unwrap(), Ordering::Greater),
+        case(Time::new(12, 30).unwrap(), Ordering::Equal),
+        case(Time::new(12, 59).unwrap(), Ordering::Less),
+        case(Time::new(13, 00).unwrap(), Ordering::Less)
     )]
-    fn can_compare_time(comparing: Time, before: bool, same: bool, after: bool) {
+    fn can_compare_time(comparing: Time, comparison: Ordering) {
         let base_time = Time { hour: 12, minute: 30 };
 
-        assert_eq!(base_time.is_before_than(&comparing), before);
-        assert_eq!(base_time.is_same_to(&comparing), same);
-        assert_eq!(base_time.is_after_than(&comparing), after);
+        assert_eq!(base_time.cmp(&comparing), comparison);
     }
 }

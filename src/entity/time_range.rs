@@ -11,10 +11,10 @@ pub enum TimeRangeValidationError {
 }
 impl TimeRange {
     pub fn new(start: Time, end: Time) -> Result<TimeRange, TimeRangeValidationError> {
-        if start.is_same_to(&end) {
+        if start == end {
             return Err(TimeRangeValidationError::SameEnd);
         }
-        if start.is_after_than(&end) {
+        if start > end {
             return Err(TimeRangeValidationError::OppositeEnd);
         }
 
@@ -22,7 +22,7 @@ impl TimeRange {
     }
 
     pub fn includes(&self, other: &Time) -> bool {
-        other.is_same_to(&self.start) || (other.is_after_than(&self.start) && other.is_before_than(&self.end))
+        other == &self.start || other > &self.start && other < &self.end
     }
 }
 
