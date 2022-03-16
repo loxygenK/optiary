@@ -86,7 +86,7 @@ mod tests {
         DoneStatusList::new(done_status)
     }
 
-    fn todo_status_list_from_time(time: &[(u8, u8)]) -> DoneStatusList {
+    fn todo_status_list_from_time(time: &[(usize, usize)]) -> DoneStatusList {
         DoneStatusList::new(
             time.iter()
                 .map(|&(h, m)| DoneStatus::new(Time::new(h, m).unwrap(), false))
@@ -102,7 +102,7 @@ mod tests {
         case((9, 00), (10,00), 0),
         case((13, 00), (14,00), 0),
     )]
-    fn can_get_todo_status_by_the_time(start: (u8, u8), end: (u8, u8), expected_count: usize) {
+    fn can_get_todo_status_by_the_time(start: (usize, usize), end: (usize, usize), expected_count: usize) {
         let todo_status_list = todo_status_list_from_time(&[(10, 00), (11, 00), (12, 00)]);
         let range = TimeRange::new(
             Time::new(start.0, start.1).unwrap(),
