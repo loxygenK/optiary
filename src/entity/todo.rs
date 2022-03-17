@@ -1,13 +1,15 @@
+use crate::entity::Date;
 use crate::entity::{TimeRange, DoneStatusList, Task};
 
 pub struct Todo {
     task: Task,
+    date: Date,
     range: TimeRange,
     status: DoneStatusList
 }
 impl Todo {
-    pub fn new(task: Task, range: TimeRange, status: DoneStatusList) -> Self {
-        Self { task, range, status }
+    pub fn new(task: Task, date: Date, range: TimeRange, status: DoneStatusList) -> Self {
+        Self { task, date, range, status }
     }
 
     pub fn task(&self) -> &Task {
