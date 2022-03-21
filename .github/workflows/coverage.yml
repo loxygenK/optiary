@@ -22,10 +22,12 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run test with generating coverage
+        working-directory: ./packages/api/
         run: |
           cargo +nightly tarpaulin --verbose --out Xml
 
       - name: Upload to codecov
         uses: codecov/codecov-action@v2
+        working-directory: ./packages/api/
         with:
           fail_ci_if_error: true
