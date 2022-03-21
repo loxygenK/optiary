@@ -10,14 +10,14 @@ struct MockTodoRepository {
     content: Vec<Todo>
 }
 impl MockTodoRepository {
-    fn new() -> MockTodoRepository {
+    fn new() -> Self {
         let task: [Task; 5] = (0..4)
-            .map(|i| { Task::new(Id::generate(), format!("task-{}", i)).unwrap() })
+            .map(|i| { Task::new(Id::new(format!("task-{}", i)), format!("task-{}", i)).unwrap() })
             .collect::<Vec<_>>()
             .try_into()
             .unwrap();
 
-        MockTodoRepository {
+        Self {
             content: (0..100)
                 .map(|i| { MockTodoRepository::generate_todo(&task, i) })
                 .collect()
@@ -26,7 +26,7 @@ impl MockTodoRepository {
 
     fn generate_todo(task_candicate: &[Task], index: usize) -> Todo {
         Todo::new(
-            Id::generate(),
+            Id::new(format!("todo-{}", index)),
             task_candicate[index % 5].to_owned(),
             MockTodoRepository::generate_range(index / 3, index % 3),
             DoneStatusList::new((0..3).map(|i| { MockTodoRepository::generate_done_status(index, i) }).collect())
@@ -35,7 +35,7 @@ impl MockTodoRepository {
 
     fn generate_done_status(date_index: usize, time_index: usize) -> DoneStatus {
         DoneStatus::new(
-            Id::generate(),
+            Id::new(format!("date_status-{}-{}", date_index, time_index)),
             MockTodoRepository::generate_datetime(date_index, time_index),
             false
         )

@@ -22,9 +22,9 @@ pub enum RepositoryError {
 pub type RepositoryResult<T> = Result<T, RepositoryError>;
 
 pub trait TaskRepository {
-    fn fetch_by_id(&self, id: &Id) -> Option<&Task>;
-    fn update(&mut self, task: &Task) -> RepositoryResult<&Task>;
-    fn remove(&mut self, task: Task) -> RepositoryResult<&Task>;
+    fn fetch_by_id(&self, id: &Id) -> Option<Task>;
+    fn update(&mut self, task: &Task) -> RepositoryResult<Task>;
+    fn remove(&mut self, task: Task) -> RepositoryResult<()>;
 }
 
 pub trait TodoRepository {
