@@ -10,10 +10,11 @@ pub enum TaskValidationError {
     EmptyName
 }
 impl Task {
-    pub fn new(id: Id, name: &str) -> Result<Self, TaskValidationError> {
-        Task::validate_name(name)?;
+    pub fn new(id: Id, name: impl Into<String>) -> Result<Self, TaskValidationError> {
+        let name = name.into();
+        Task::validate_name(&name)?;
 
-        Ok(Self { id, name: name.to_owned() })
+        Ok(Self { id, name })
     }
 
     pub fn id(&self) -> &Id {
