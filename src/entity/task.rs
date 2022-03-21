@@ -42,6 +42,7 @@ impl Task {
 
 #[cfg(test)]
 mod tests {
+    use crate::types::Id;
     use super::{Task, TaskValidationError};
     use rstest::rstest;
 
@@ -50,7 +51,7 @@ mod tests {
         case("", Some(TaskValidationError::EmptyName))
     )]
     fn initializing_empty_name_not_allowed(name: &str, expected: Option<TaskValidationError>) {
-        let maybe_task = Task::new("task-id-1".to_owned(), name);
+        let maybe_task = Task::new(Id::new("task-id-1"), name);
 
         assert_eq!(maybe_task.err(), expected);
     }
@@ -60,7 +61,7 @@ mod tests {
         case("", Some(TaskValidationError::EmptyName))
     )]
     fn setting_empty_name_not_allowed(name: &str, expected: Option<TaskValidationError>) {
-        let mut task = Task::new("task-id-1".to_owned(), "Ok").unwrap();
+        let mut task = Task::new(Id::new("task-id-1"), "Ok").unwrap();
 
         assert_eq!(task.set_name(name).err(), expected);
     }

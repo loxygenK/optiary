@@ -1,6 +1,18 @@
+#[cfg(feature = "memory-db")]
+mod memory;
+
+#[cfg(feature = "memory-db")]
+pub use memory::*;
+
+#[cfg(all(feature = "memory-db", feature = "postgres-db"))]
+compile_error!("'memory-db' and 'postgres-db' cannot be set at the same time");
+
+#[cfg(not(any(feature = "memory-db", feature = "postgres-db")))]
+compile_error!("[repo] Either of 'memory-db' and 'postgres-db' should be set");
+
 use crate::entity::Todo;
 use crate::entity::Task;
-use crate::types::WithId;
+use crate::types::Id;
 
 #[derive(PartialEq, Debug)]
 pub enum RepositoryError {
@@ -10,14 +22,14 @@ pub enum RepositoryError {
 pub type RepositoryResult<T> = Result<T, RepositoryError>;
 
 pub trait TaskRepository {
-    fn fetch_by_id(id: &str) -> Option<WithId<Task>>;
-    fn update(task: &WithId<Task>) -> RepositoryResult<WithId<Task>>;
-    fn remove(task: WithId<Task>) -> RepositoryResult<Task>;
+    fn fetch_by_id(&self, id: &Id) -> Option<&Task>;
+    fn update(&mut self, task: &Task) -> RepositoryResult<&Task>;
+    fn remove(&mut self, task: Task) -> RepositoryResult<&Task>;
 }
 
 pub trait TodoRepository {
-    fn fetch_by_id(id: &str) -> Option<WithId<Todo>>;
-    fn fetch_by_task(task_id: &str) -> RepositoryResult<Vec<WithId<Todo>>>;
-    fn update(todo: &WithId<Todo>) -> RepositoryResult<WithId<Todo>>;
-    fn remove(todo: WithId<Todo>) -> RepositoryResult<Todo>;
+    fn fetch_by_id(&self, id: &Id) -> Option<Todo>;
+    fn fetch_by_task(&self, task_id: &Id) -> RepositoryResult<Vec<Todo>>;
+    fn update(&mut self, todo: &Todo) -> RepositoryResult<Todo>;
+    fn remove(&mut self, todo: Todo) -> RepositoryResult<()>;
 }
