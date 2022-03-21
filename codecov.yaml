@@ -1,0 +1,4 @@
+flags:
+  api:
+    paths:
+      - packages/api/
