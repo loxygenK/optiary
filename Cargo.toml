@@ -2,14 +2,21 @@
 name = "opatiary-api"
 version = "0.1.0"
 edition = "2021"
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 anyhow = "1.0.56"
+chrono = { version = "0.4.19", optional = true }
 rstest = "0.12.0"
 serde = { version = "1.0.136", features = ["derive"] }
 serde_json = "1.0.79"
 speculate = "0.1.2"
 tokio = { version = "1.17.0", features = ["full"] }
+uuid = { version = "0.8.2", features = ["v4"] }
 warp = "0.3.2"
+
+[features]
+default = ["memory-db"]
+
+memory-db = ["chrono"]
+postgres-db = []
