@@ -1,5 +1,6 @@
 use crate::types::Id;
 
+#[derive(Clone, Debug)]
 pub struct Task {
     id: Id,
     name: String

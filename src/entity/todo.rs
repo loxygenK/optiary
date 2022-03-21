@@ -1,6 +1,7 @@
 use crate::entity::{DateTimeRange, DoneStatusList, Task};
 use crate::types::Id;
 
+#[derive(Clone, Debug)]
 pub struct Todo {
     id: Id,
     task: Task,

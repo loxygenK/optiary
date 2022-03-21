@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 
+#[derive(Clone, Debug)]
 pub struct DateTimeRange {
     start: DateTime<Utc>,
     end: DateTime<Utc>
