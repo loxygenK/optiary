@@ -3,26 +3,26 @@ use std::cmp::Ordering::{Less, Equal, Greater};
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct Time {
-    hour: usize,
-    minute: usize
+    hour: u32,
+    minute: u32
 }
 #[derive(PartialEq, Debug)]
 pub enum TimeValidationError {
     OutOfRange
 }
 impl Time {
-    pub fn new(hour: usize, minute: usize) -> Result<Self, TimeValidationError> {
+    pub fn new(hour: u32, minute: u32) -> Result<Self, TimeValidationError> {
         if hour > 23 || minute > 59 {
             return Err(TimeValidationError::OutOfRange)
         }
         Ok(Self { hour, minute })
     }
 
-    pub fn hour(&self) -> usize {
+    pub fn hour(&self) -> u32 {
         self.hour
     }
 
-    pub fn minute(&self) -> usize {
+    pub fn minute(&self) -> u32 {
         self.minute
     }
 
@@ -32,10 +32,10 @@ impl Time {
         }
         let self_minutes: u64 = (self.hour * 60 + self.minute)
             .try_into()
-            .expect(&format!("must not happen: Converting Time to minute failed ({:?})", self));
+            .unwrap_or_else(|_| panic!("must not happen: Converting Time to minute failed ({:?})", self));
         let other_minutes: u64 = (from.hour * 60 + from.minute)
             .try_into()
-            .expect(&format!("must not happen: Converting Time to minute failed ({:?})", self));
+            .unwrap_or_else(|_| panic!("must not happen: Converting Time to minute failed ({:?})", self));
 
         Some(Duration::from_secs((self_minutes - other_minutes) * 60))
     }
@@ -69,7 +69,7 @@ mod tests {
         case(24, 00, Some(TimeValidationError::OutOfRange)),
         case(0, 60, Some(TimeValidationError::OutOfRange))
     )]
-    fn out_of_range_not_allowed(hour: usize, minute: usize, expected: Option<TimeValidationError>) {
+    fn out_of_range_not_allowed(hour: u32, minute: u32, expected: Option<TimeValidationError>) {
         let maybe_time = Time::new(hour, minute);
 
         assert_eq!(maybe_time.err(), expected);
