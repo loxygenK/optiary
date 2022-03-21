@@ -1,34 +1,40 @@
-use crate::entity::{TimeRange, Time};
+use crate::{entity::{TimeRange, Time}, types::Id};
 
 pub struct DoneStatus {
+    id: Id,
     applicable_time: Time,
     done: bool
 }
 impl DoneStatus {
-    fn new(applicable_time: Time, done: bool) -> Self {
+    pub fn new(id: Id, applicable_time: Time, done: bool) -> Self {
         Self {
+            id,
             applicable_time,
             done
         }
     }
 
-    fn applicable_time(&self) -> &Time {
+    pub fn id(&self) -> &Id {
+        &self.id
+    }
+
+    pub fn applicable_time(&self) -> &Time {
         &self.applicable_time
     }
 
-    fn done(&self) -> bool {
+    pub fn done(&self) -> bool {
         self.done
     }
 
-    fn undone(&self) -> bool {
+    pub fn undone(&self) -> bool {
         !self.done()
     }
 
-    fn mark_as_done(&mut self) {
+    pub fn mark_as_done(&mut self) {
         self.done = true
     }
 
-    fn mark_as_undone(&mut self) {
+    pub fn mark_as_undone(&mut self) {
         self.done = false
     }
 }
@@ -86,7 +92,7 @@ mod tests {
 
     #[rstest]
     fn can_mark_as_done_or_undone() {
-        let mut done_status = DoneStatus::new(Time::new(12, 00).unwrap(), false);
+        let mut done_status = DoneStatus::new("done-status".to_owned(), Time::new(12, 00).unwrap(), false);
 
         done_status.mark_as_done();
         assert_eq!(done_status.done(), true);
@@ -97,20 +103,20 @@ mod tests {
         assert_eq!(done_status.undone(), true);
     }
 
-    fn todo_status_list_from_done_count(done: usize, undone: usize) -> DoneStatusList {
+    fn todo_status_list_from_done_count(done: u32, undone: u32) -> DoneStatusList {
         let dones = (0..done)
-            .map(|_| DoneStatus::new(Time::new(12, 30).unwrap(), true));
+            .map(|_| DoneStatus::new("done_status-id-1".to_owned(), Time::new(12, 30).unwrap(), true));
         let undones = (0..undone)
-            .map(|_| DoneStatus::new(Time::new(12, 30).unwrap(), false));
+            .map(|_| DoneStatus::new("done_status-id-2".to_owned(), Time::new(12, 30).unwrap(), false));
 
         let done_status: Vec<DoneStatus> = dones.chain(undones).collect();
         DoneStatusList::new(done_status)
     }
 
-    fn todo_status_list_from_time(time: &[(usize, usize)]) -> DoneStatusList {
+    fn todo_status_list_from_time(time: &[(u32, u32)]) -> DoneStatusList {
         DoneStatusList::new(
             time.iter()
-                .map(|&(h, m)| DoneStatus::new(Time::new(h, m).unwrap(), false))
+                .map(|&(h, m)| DoneStatus::new(format!("done_status-id-{}-{}", h, m), Time::new(h, m).unwrap(), false))
                 .collect()
         )
     }
@@ -123,14 +129,15 @@ mod tests {
         case((9, 00), (10,00), 0),
         case((13, 00), (14,00), 0),
     )]
-    fn can_get_todo_status_by_the_time(start: (usize, usize), end: (usize, usize), expected_count: usize) {
+    fn can_get_todo_status_by_the_time(start: (u32, u32), end: (u32, u32), expected_count: u32) {
         let todo_status_list = todo_status_list_from_time(&[(10, 00), (11, 00), (12, 00)]);
         let range = TimeRange::new(
             Time::new(start.0, start.1).unwrap(),
             Time::new(end.0, end.1).unwrap()
         ).unwrap();
+        let todo_status_len: u32 = todo_status_list.get_from_range(&range).len().try_into().unwrap();
 
-        assert_eq!(todo_status_list.get_from_range(&range).len(), expected_count);
+        assert_eq!(todo_status_len, expected_count);
     }
 
     #[rstest(done, undone, expected_complete,
@@ -139,7 +146,7 @@ mod tests {
         case(1, 4, false),
         case(0, 0, false)
     )]
-    fn marked_as_complete_when_all_todo_status_is_done(done: usize, undone: usize, expected_complete: bool) {
+    fn marked_as_complete_when_all_todo_status_is_done(done: u32, undone: u32, expected_complete: bool) {
         let todo_status_list = todo_status_list_from_done_count(done, undone);
 
         assert_eq!(todo_status_list.complete(), expected_complete);
@@ -151,10 +158,11 @@ mod tests {
         case(1, 4),
         case(0, 0)
     )]
-    fn can_count_todos_marked_as_done(done: usize, undone: usize) {
+    fn can_count_todos_marked_as_done(done: u32, undone: u32) {
         let todo_status_list = todo_status_list_from_done_count(done, undone);
+        let dones: u32 = todo_status_list.dones().try_into().unwrap();
 
-        assert_eq!(todo_status_list.dones(), done);
+        assert_eq!(dones, done);
     }
 
     #[rstest(done, undone, expected_max_dones,
@@ -163,9 +171,10 @@ mod tests {
         case(3, 3, 6),
         case(0, 0, 0)
     )]
-    fn can_count_maximum_dones(done: usize, undone: usize, expected_max_dones: usize) {
+    fn can_count_maximum_dones(done: u32, undone: u32, expected_max_dones: u32) {
         let todo_status_list = todo_status_list_from_done_count(done, undone);
+        let max_dones: u32 = todo_status_list.max_dones().try_into().unwrap();
 
-        assert_eq!(todo_status_list.max_dones(), expected_max_dones);
+        assert_eq!(max_dones, expected_max_dones);
     }
 }

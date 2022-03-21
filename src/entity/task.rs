@@ -1,4 +1,7 @@
+use crate::types::Id;
+
 pub struct Task {
+    id: Id,
     name: String
 }
 #[derive(PartialEq, Debug)]
@@ -6,10 +9,14 @@ pub enum TaskValidationError {
     EmptyName
 }
 impl Task {
-    pub fn new(name: &str) -> Result<Self, TaskValidationError> {
+    pub fn new(id: Id, name: &str) -> Result<Self, TaskValidationError> {
         Task::validate_name(name)?;
 
-        Ok(Self { name: name.to_owned() })
+        Ok(Self { id, name: name.to_owned() })
+    }
+
+    pub fn id(&self) -> &Id {
+        &self.id
     }
 
     pub fn name(&self) -> &str {
@@ -41,7 +48,7 @@ mod tests {
         case("", Some(TaskValidationError::EmptyName))
     )]
     fn initializing_empty_name_not_allowed(name: &str, expected: Option<TaskValidationError>) {
-        let maybe_task = Task::new(name);
+        let maybe_task = Task::new("task-id-1".to_owned(), name);
 
         assert_eq!(maybe_task.err(), expected);
     }
@@ -51,7 +58,7 @@ mod tests {
         case("", Some(TaskValidationError::EmptyName))
     )]
     fn setting_empty_name_not_allowed(name: &str, expected: Option<TaskValidationError>) {
-        let mut task = Task::new("Ok").unwrap();
+        let mut task = Task::new("task-id-1".to_owned(), "Ok").unwrap();
 
         assert_eq!(task.set_name(name).err(), expected);
     }
