@@ -18,23 +18,27 @@ impl MockTodoRepository {
             .unwrap();
 
         MockTodoRepository {
-            content: (0..100).map(|i| {
-                Todo::new(
-                    Id::generate(),
-                    task[i % 5].to_owned(),
-                    MockTodoRepository::generate_range(i / 3, i % 3),
-                    DoneStatusList::new(
-                        (0..3).map(|j| {
-                            DoneStatus::new(
-                                Id::generate(),
-                                MockTodoRepository::generate_datetime(i, j),
-                                false
-                            )
-                        }).collect()
-                    )
-                )
-            }).collect()
+            content: (0..100)
+                .map(|i| { MockTodoRepository::generate_todo(&task, i) })
+                .collect()
         }
+    }
+
+    fn generate_todo(task_candicate: &[Task], index: usize) -> Todo {
+        Todo::new(
+            Id::generate(),
+            task_candicate[index % 5].to_owned(),
+            MockTodoRepository::generate_range(index / 3, index % 3),
+            DoneStatusList::new((0..3).map(|i| { MockTodoRepository::generate_done_status(index, i) }).collect())
+        )
+    }
+
+    fn generate_done_status(date_index: usize, time_index: usize) -> DoneStatus {
+        DoneStatus::new(
+            Id::generate(),
+            MockTodoRepository::generate_datetime(date_index, time_index),
+            false
+        )
     }
 
     fn generate_range(date_index: usize, time_index: usize) -> DateTimeRange {
