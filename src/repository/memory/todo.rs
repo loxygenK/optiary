@@ -67,6 +67,12 @@ impl TodoRepository for MockTodoRepository {
         Ok(self.content.iter().filter(|t| t.task().id() == task_id).cloned().collect())
     }
 
+    fn create(&mut self, todo: &Todo) -> RepositoryResult<()> {
+        self.content.push(todo.to_owned());
+
+        Ok(())
+    }
+
     fn update(&mut self, todo: &Todo) -> RepositoryResult<Todo> {
         let replace_index = self.content
             .iter()

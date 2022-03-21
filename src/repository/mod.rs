@@ -23,6 +23,7 @@ pub type RepositoryResult<T> = Result<T, RepositoryError>;
 
 pub trait TaskRepository {
     fn fetch_by_id(&self, id: &Id) -> Option<Task>;
+    fn create(&mut self, todo: &Task) -> RepositoryResult<()>;
     fn update(&mut self, task: &Task) -> RepositoryResult<Task>;
     fn remove(&mut self, task: Task) -> RepositoryResult<()>;
 }
@@ -30,6 +31,7 @@ pub trait TaskRepository {
 pub trait TodoRepository {
     fn fetch_by_id(&self, id: &Id) -> Option<Todo>;
     fn fetch_by_task(&self, task_id: &Id) -> RepositoryResult<Vec<Todo>>;
+    fn create(&mut self, todo: &Todo) -> RepositoryResult<()>;
     fn update(&mut self, todo: &Todo) -> RepositoryResult<Todo>;
     fn remove(&mut self, todo: Todo) -> RepositoryResult<()>;
 }

@@ -17,6 +17,12 @@ impl TaskRepository for MockTaskRepository {
         self.content.iter().find(|t| t.id() == id).cloned()
     }
 
+    fn create(&mut self, todo: &Task) -> RepositoryResult<()> {
+        self.content.push(todo.to_owned());
+
+        Ok(())
+    }
+
     fn update(&mut self, task: &Task) -> RepositoryResult<Task> {
         let replace_index = self.content
             .iter()
