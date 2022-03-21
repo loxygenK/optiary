@@ -47,7 +47,7 @@ impl TimeRange {
             return Err(TimeRangeValidationError::OppositeEnd);
         }
 
-        return Ok(())
+        Ok(())
     }
 }
 
