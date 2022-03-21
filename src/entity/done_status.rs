@@ -1,12 +1,15 @@
-use crate::{entity::{TimeRange, Time}, types::Id};
+use chrono::{Utc, DateTime};
 
+use crate::{entity::DateTimeRange, types::Id};
+
+#[derive(Clone, Debug)]
 pub struct DoneStatus {
     id: Id,
-    applicable_time: Time,
+    applicable_time: DateTime<Utc>,
     done: bool
 }
 impl DoneStatus {
-    pub fn new(id: Id, applicable_time: Time, done: bool) -> Self {
+    pub fn new(id: Id, applicable_time: DateTime<Utc>, done: bool) -> Self {
         Self {
             id,
             applicable_time,
@@ -18,7 +21,7 @@ impl DoneStatus {
         &self.id
     }
 
-    pub fn applicable_time(&self) -> &Time {
+    pub fn applicable_time(&self) -> &DateTime<Utc> {
         &self.applicable_time
     }
 
@@ -39,6 +42,7 @@ impl DoneStatus {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct DoneStatusList {
     statuses: Vec<DoneStatus>
 }
@@ -51,7 +55,7 @@ impl DoneStatusList {
         &self.statuses
     }
 
-    pub fn get_from_range(&self, range: &TimeRange) -> Vec<&DoneStatus> {
+    pub fn get_from_range(&self, range: &DateTimeRange) -> Vec<&DoneStatus> {
         self.statuses
             .iter()
             .filter(|&s| range.includes(&s.applicable_time))
@@ -87,12 +91,19 @@ impl DoneStatusList {
 
 #[cfg(test)]
 mod tests {
-    use super::{Time, TimeRange, DoneStatus, DoneStatusList};
+    use crate::types::Id;
+    use super::{DoneStatus, DoneStatusList, DateTimeRange};
+
+    use chrono::{Utc, DateTime, TimeZone};
     use rstest::rstest;
+
+    fn create_time(hour: u32, minute: u32) -> DateTime<Utc> {
+        Utc.ymd(2022, 1, 1).and_hms(hour, minute, 00)
+    }
 
     #[rstest]
     fn can_mark_as_done_or_undone() {
-        let mut done_status = DoneStatus::new("done-status".to_owned(), Time::new(12, 00).unwrap(), false);
+        let mut done_status = DoneStatus::new(Id::new("done-status"), create_time(12, 00), false);
 
         done_status.mark_as_done();
         assert_eq!(done_status.done(), true);
@@ -105,9 +116,9 @@ mod tests {
 
     fn todo_status_list_from_done_count(done: u32, undone: u32) -> DoneStatusList {
         let dones = (0..done)
-            .map(|_| DoneStatus::new("done_status-id-1".to_owned(), Time::new(12, 30).unwrap(), true));
+            .map(|_| DoneStatus::new(Id::new("done_status-id-1"), create_time(12, 30), true));
         let undones = (0..undone)
-            .map(|_| DoneStatus::new("done_status-id-2".to_owned(), Time::new(12, 30).unwrap(), false));
+            .map(|_| DoneStatus::new(Id::new("done_status-id-2"), create_time(12, 30), false));
 
         let done_status: Vec<DoneStatus> = dones.chain(undones).collect();
         DoneStatusList::new(done_status)
@@ -116,7 +127,7 @@ mod tests {
     fn todo_status_list_from_time(time: &[(u32, u32)]) -> DoneStatusList {
         DoneStatusList::new(
             time.iter()
-                .map(|&(h, m)| DoneStatus::new(format!("done_status-id-{}-{}", h, m), Time::new(h, m).unwrap(), false))
+                .map(|&(h, m)| DoneStatus::new(Id::new(format!("done_status-id-{}-{}", h, m)), create_time(h, m), false))
                 .collect()
         )
     }
@@ -131,9 +142,9 @@ mod tests {
     )]
     fn can_get_todo_status_by_the_time(start: (u32, u32), end: (u32, u32), expected_count: u32) {
         let todo_status_list = todo_status_list_from_time(&[(10, 00), (11, 00), (12, 00)]);
-        let range = TimeRange::new(
-            Time::new(start.0, start.1).unwrap(),
-            Time::new(end.0, end.1).unwrap()
+        let range = DateTimeRange::new(
+            create_time(start.0, start.1),
+            create_time(end.0, end.1)
         ).unwrap();
         let todo_status_len: u32 = todo_status_list.get_from_range(&range).len().try_into().unwrap();
 
