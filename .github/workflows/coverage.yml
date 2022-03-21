@@ -23,7 +23,7 @@ jobs:
 
       - name: Run test with generating coverage
         run: |
-          cargo +nightly tarpaulin --verbose --all-features --out Xml
+          cargo +nightly tarpaulin --verbose --out Xml
 
       - name: Upload to codecov
         uses: codecov/codecov-action@v2
