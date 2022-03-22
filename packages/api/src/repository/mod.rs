@@ -14,9 +14,14 @@ use crate::entity::Todo;
 use crate::entity::Task;
 use crate::types::Id;
 
-#[derive(PartialEq, Debug)]
+use thiserror::Error;
+
+#[derive(PartialEq, Debug, Error)]
 pub enum RepositoryError {
+    #[error("The target object should be found in this context, but it wasn't")]
     NotFound,
+
+    #[error("Internal error occured")]
     InternalError(String)
 }
 pub type RepositoryResult<T> = Result<T, RepositoryError>;

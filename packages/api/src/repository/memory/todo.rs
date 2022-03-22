@@ -6,12 +6,12 @@ use crate::entity::{Todo, Task, DateTimeRange, DoneStatus, DoneStatusList};
 use crate::repository::{RepositoryResult, TodoRepository, RepositoryError};
 use crate::types::Id;
 
-struct MockTodoRepository {
+pub struct MockTodoRepository {
     content: Vec<Todo>
 }
 impl MockTodoRepository {
-    fn new() -> Self {
-        let task: [Task; 5] = (0..4)
+    pub fn new() -> Self {
+        let task: [Task; 5] = (0..5)
             .map(|i| { Task::new(Id::new(format!("task-{}", i)), format!("task-{}", i)).unwrap() })
             .collect::<Vec<_>>()
             .try_into()
@@ -29,33 +29,33 @@ impl MockTodoRepository {
             Id::new(format!("todo-{}", index)),
             task_candicate[index % 5].to_owned(),
             MockTodoRepository::generate_range(index / 3, index % 3),
-            DoneStatusList::new((0..3).map(|i| { MockTodoRepository::generate_done_status(index, i) }).collect())
+            DoneStatusList::new((0..3).map(|i| { MockTodoRepository::generate_done_status(index / 3, i) }).collect())
         )
     }
 
     fn generate_done_status(date_index: usize, time_index: usize) -> DoneStatus {
         DoneStatus::new(
             Id::new(format!("date_status-{}-{}", date_index, time_index)),
-            MockTodoRepository::generate_datetime(date_index, time_index),
+            MockTodoRepository::generate_datetime(date_index, time_index, 1),
             false
         )
     }
 
     fn generate_range(date_index: usize, time_index: usize) -> DateTimeRange {
-        let start = MockTodoRepository::generate_datetime(date_index, time_index);
-        let end = MockTodoRepository::generate_datetime(date_index + 1, time_index);
+        let start = MockTodoRepository::generate_datetime(date_index, time_index, 3);
+        let end = MockTodoRepository::generate_datetime(date_index, time_index + 1, 3);
 
         DateTimeRange::new(start, end).unwrap()
     }
 
-    fn generate_datetime(date_index: usize, time_index: usize) -> DateTime<Utc> {
+    fn generate_datetime(date_index: usize, time_index: usize, diff: u32) -> DateTime<Utc> {
         let date_index: i64 = date_index.try_into().unwrap();
         let time_index: u32 = time_index.try_into().unwrap();
 
         Utc::now()
             .add(Duration::days(date_index))
             .date()
-            .and_hms(8 + time_index * 3, 0, 0)
+            .and_hms(8 + time_index * diff, 0, 0)
     }
 }
 impl TodoRepository for MockTodoRepository {

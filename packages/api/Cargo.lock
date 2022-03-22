@@ -523,6 +523,7 @@ dependencies = [
  "serde",
  "serde_json",
  "speculate",
+ "thiserror",
  "tokio",
  "uuid",
  "warp",
